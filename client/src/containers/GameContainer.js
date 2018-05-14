@@ -70,7 +70,7 @@ class GameContainer extends Component {
     const tempState = this.state;
     console.log(tempState.player1Tiles[index].colour);
     if (tempState.player1Tiles[index].colour === "z-blank"){
-      console.log();
+
       if (tempState.selectedTableTile) {
         tempState.player1Tiles.splice(index, 1, tempState.selectedTableTile);
         tempState.selectedTableTile = null;
@@ -82,7 +82,7 @@ class GameContainer extends Component {
       }
       else  return;
 
-    } else if (tempState.selectedPlayer1Tile) {
+    } else if (tempState.selectedTableTile) {
       return;
     } else {
       tempState.selectedPlayer1Tile = tempState.player1Tiles[index];
@@ -100,6 +100,7 @@ class GameContainer extends Component {
     const tempState = this.state;
 
     console.log(tempState.tableTiles[index].colour === "z-blank");
+    console.log(tempState.selectedTableTile);
 
     if (tempState.tableTiles[index].colour === "z-blank" && tempState.selectedPlayer1Tile) {
       tempState.tableTiles.splice(index, 1, tempState.selectedPlayer1Tile);
