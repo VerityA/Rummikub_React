@@ -82,7 +82,7 @@ class GameContainer extends Component {
       }
       else  return;
 
-    } else if (tempState.selectedTableTile) {
+    } else if (tempState.selectedTableTile || tempState.selectedPlayer1Tile) {
       return;
     } else {
       tempState.selectedPlayer1Tile = tempState.player1Tiles[index];
@@ -107,7 +107,7 @@ class GameContainer extends Component {
       tempState.selectedPlayer1Tile = null;
     }
     else if(tempState.tableTiles[index].colour !== "z-blank") {
-      if (tempState.selectedPlayer1Tile) return;
+      if (tempState.selectedPlayer1Tile ||tempState.selectedTableTile) return;
       tempState.selectedTableTile = tempState.tableTiles[index];
       tempState.tableTiles.splice(index, 1, emptyTile);
     }
