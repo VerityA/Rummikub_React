@@ -1,0 +1,20 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "mocha": "^5.1.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "socket.io": "^2.1.0"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.12"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "mocha specs",
+    "eject": "react-scripts eject"
+  }
+}
