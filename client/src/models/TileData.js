@@ -50,6 +50,12 @@ class TileData {
     return allTiles;
   };
 
+  findIndexOfFirstEmptyTile(board) {
+    const emptyTile = this.createEmptyTile();
+    const index = board.findIndex(tile => tile.colour === emptyTile.colour);
+    return index;
+  };
+
   sortTilesByColourThenValue(tiles) {
     const colours = ["black", "blue", "orange", "red", "wild", "z-blank"];
 
@@ -133,6 +139,7 @@ class TileData {
     for (let i =0; i<14; i++) {
       const randomTile = this.getRandomTileFromBox(box);
       startingTiles.push(randomTile);
+      startingTiles.push(this.createEmptyTile());
       box = this.removeTileFromBox(randomTile, box);
     };
 

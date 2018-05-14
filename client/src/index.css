@@ -34,7 +34,7 @@ body {
 
 .players-table {
   height: 200px;
-  width: 900px;
+  width: 825px;
   display: flex;
   flex-wrap: wrap;
   margin-top: 1em;

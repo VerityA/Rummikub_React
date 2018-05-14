@@ -232,12 +232,12 @@ describe('TileData', function() {
     const startingTiles = object.startingTiles;
     const remainingBoxTiles = object.remainingBox;
     assert.strictEqual(boxTiles.length, 14);
-    assert.strictEqual(startingTiles.length, 14);
+    assert.strictEqual(startingTiles.length, 28);
   });
 
   it('should create emptyTable on start', function() {
     const result = data.createEmptyTable();
-    assert.strictEqual(result.length, 150);
+    assert.strictEqual(result.length, 126);
   });
 
   it('should create emptyPlayerBoard on start', function() {
@@ -248,17 +248,29 @@ describe('TileData', function() {
 
     it('can count number of blank tiles on player board', function() {
       const board = [
-        {colour: "blank", value: 0, img: "./images/blank_tile.png"},
+        {colour: "z-blank", value: 0, img: "./images/blank_tile.png"},
         {colour: "orange", value: 1, img: "./images/orange_1.png"},
         {colour: "orange", value: 9, img: "./images/orange_9.png"},
         {colour: "red", value: 12, img: "./images/red_12.png"},
-        {colour: "blank", value: 0, img: "./images/blank_tile.png"},
+        {colour: "z-blank", value: 0, img: "./images/blank_tile.png"},
         {colour: "red", value: 6, img: "./images/red_6.png"},
-        {colour: "blank", value: 0, img: "./images/blank_tile.png"},
+        {colour: "z-blank", value: 0, img: "./images/blank_tile.png"},
         {colour: "red", value: 2, img: "./images/red_2.png"}
       ];
       const result = data.countBlankTilesOnBoard(board);
       assert.strictEqual(result, 3);
+    });
+
+    it('can find index of first empty tile on board', function() {
+      const board = [
+        {colour: "orange", value: 1, img: "./images/orange_1.png"},
+        {colour: "z-blank", value: 0, img: "./images/blank_tile.png"},
+        {colour: "red", value: 12, img: "./images/red_12.png"},
+        {colour: "red", value: 6, img: "./images/red_6.png"},
+        {colour: "red", value: 2, img: "./images/red_2.png"}
+      ];
+      const result = data.findIndexOfFirstEmptyTile(board);
+      assert.strictEqual(result, 1);
     });
 
 

@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const GameLogic = require('./models/GameLogic.js');
+
+const gameLogic = new GameLogic();
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -11,8 +14,40 @@ app.use(function(req, res, next) {
 });
 
 io.on('connection', socket => {
-  socket.on('chat', message => {
-    io.sockets.emit('chat', message);
+  gameLogic.addNewPlayer(socket.id)
+  console.log('player1 ID: ', gameLogic.player1ID);
+  console.log('player2 ID: ', gameLogic.player2ID);
+  console.log('player 1 tiles: ', gameLogic.player1Tiles);
+  console.log('player 2 tiles: ', gameLogic.player2Tiles);
+  console.log('a user connected');
+  console.log(socket.id);
+
+  socket.on('playerID', message => {
+    console.log('player who clicked button: ', socket.id);
+  });
+
+  socket.on('getPlayersStartingTiles', () => {
+    gameLogic.getStartingTiles(socket.id);
+    if (socket.id === gameLogic.player1ID){
+      socket.emit('takeStartingTiles', gameLogic.player1Tiles)
+    } else {
+      socket.emit('takeStartingTiles', gameLogic.player2Tiles)
+    }
+
+    console.log('player 1 tiles: ', gameLogic.player1Tiles);
+    console.log('player 2 tiles: ', gameLogic.player2Tiles);
+  });
+
+  socket.on('getExtraTileFromBox', () => {
+    gameLogic.getExtraTileFromBox(socket.id);
+    if (socket.id === gameLogic.player1ID){
+      socket.emit('takeExtraTile', gameLogic.player1Tiles)
+    } else {
+      socket.emit('takeExtraTile', gameLogic.player2Tiles)
+    }
+
+    console.log('player 1 tiles: ', gameLogic.player1Tiles);
+    console.log('player 2 tiles: ', gameLogic.player2Tiles);
   });
 });
 
