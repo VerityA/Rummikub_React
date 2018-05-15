@@ -39,15 +39,16 @@ io.on('connection', socket => {
   });
 
   socket.on('changePlayerTurn', () => {
-      gameLogic.changeCurrentPlayer();
-      console.log(gameLogic.currentPlayer);
-      if (socket.id === gameLogic.currentPlayer) {
-        socket.emit('setNotCurrentPlayer', false);
-        socket.broadcast.emit('setNotCurrentPlayer', true);
-      } else {
-        socket.emit('setNotCurrentPlayer', true);
-        socket.broadcast.emit('setNotCurrentPlayer', false);
-      };
+    gameLogic.changeCurrentPlayer();
+    gameLogic.setNoTilesOnBoardLastGo(socket.id);
+    console.log(gameLogic.currentPlayer);
+    if (socket.id === gameLogic.currentPlayer) {
+      socket.emit('setNotCurrentPlayer', false);
+      socket.broadcast.emit('setNotCurrentPlayer', true);
+    } else {
+      socket.emit('setNotCurrentPlayer', true);
+      socket.broadcast.emit('setNotCurrentPlayer', false);
+    };
 
     console.log('currentPlayer', gameLogic.currentPlayer);
   });
@@ -71,9 +72,8 @@ io.on('connection', socket => {
 
   socket.on('getExtraTileFromBox', () => {
     if (socket.id !== gameLogic.player1ID && socket.id !== gameLogic.player2ID) return;
-    gameLogic.getExtraTileFromBox(socket.id);
 
-    
+    gameLogic.getExtraTileFromBox(socket.id);
 
     if (socket.id === gameLogic.player1ID){
       socket.emit('takeExtraTile', gameLogic.player1Tiles);
@@ -90,33 +90,34 @@ io.on('connection', socket => {
     gameLogic.handleBoardAction(socket.id, index);
     if (socket.id === gameLogic.player1ID){
       socket.emit('showPlayerBoardTiles', gameLogic.player1Tiles);
-      // io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+      console.log('length of P1 tiles on last go: ', gameLogic.noTilesOnPlayer1BoardLastGo);
+      console.log('length of P1 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles));
+      if (gameLogic.noTilesOnPlayer1BoardLastGo > gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles)){
+        socket.emit('changeStatusOfTakeExtraTileButton', true);
+      } else {
+        socket.emit('changeStatusOfTakeExtraTileButton', false);
+      };
     } else {
-      socket.emit('showPlayerBoardTiles', gameLogic.player2Tiles)
-      // io.sockets.emit('showTableTiles', gameLogic.tableTiles);
-    }
+      socket.emit('showPlayerBoardTiles', gameLogic.player2Tiles);
+      console.log('length of P2 tiles on last go: ', gameLogic.noTilesOnPlayer2BoardLastGo);
+      console.log('length of P2 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles));
+      if (gameLogic.noTilesOnPlayer2BoardLastGo > gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles)){
+        socket.emit('changeStatusOfTakeExtraTileButton', true);
+      } else {
+        socket.emit('changeStatusOfTakeExtraTileButton', false);
+      };
+    };
 
-    console.log('player 1 tiles: ', gameLogic.player1Tiles);
-    console.log('player 2 tiles: ', gameLogic.player2Tiles);
-    console.log('table tiles: ', gameLogic.tableTiles);
   });
 
   socket.on('handleTableClick', index => {
     console.log(index);
     gameLogic.handleTableAction(socket.id, index);
     if (socket.id === gameLogic.player1ID){
-      // socket.emit('showPlayerBoardTiles', gameLogic.player1Tiles);
       io.sockets.emit('showTableTiles', gameLogic.tableTiles);
-      console.log('player 1 tiles: ', gameLogic.player1Tiles);
     } else {
-      // socket.emit('showPlayerBoardTiles', gameLogic.player2Tiles)
       io.sockets.emit('showTableTiles', gameLogic.tableTiles);
-      console.log('player 2 tiles: ', gameLogic.player2Tiles);
-    }
-
-
-
-    console.log('table tiles: ', gameLogic.tableTiles);
+    };
   });
 });
 

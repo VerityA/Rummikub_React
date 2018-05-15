@@ -18,6 +18,13 @@ class GameLogic {
 
     this.player1Tiles = null;
     this.player2Tiles = null;
+
+    this.noTilesOnPlayer1BoardLastGo = 14;
+    this.noTilesOnPlayer2BoardLastGo = 14;
+  };
+
+  countNoActiveTilesOnBoard(board) {
+    return this.tileData.countColouredTilesOnBoard(board);
   };
 
   addNewPlayer(playerID) {
@@ -32,6 +39,13 @@ class GameLogic {
     if (!this.currentPlayer && this.player1ID) {
       this.currentPlayer = this.player1ID;
     } else return;
+  };
+
+  setNoTilesOnBoardLastGo(playerID) {
+    if (this.player1ID === playerID) {
+      this.noTilesOnPlayer1BoardLastGo = this.tileData.countColouredTilesOnBoard(this.player1Tiles);
+    } else {this.noTilesOnPlayer2BoardLastGo = this.tileData.countColouredTilesOnBoard(this.player2Tiles);;
+    };
   };
 
   changeCurrentPlayer() {
@@ -84,34 +98,34 @@ class GameLogic {
     console.log('is tableTile blank and there is a selected player2 tile: ', (this.tableTiles.colour === "z-blank" && this.selectedPlayer2Tile));
 
     if (this.player1ID === socketID) {
-    if (this.tableTiles[index].colour === "z-blank" && this.selectedPlayer1Tile) {
-      this.tableTiles.splice(index, 1, this.selectedPlayer1Tile);
-      this.selectedPlayer1Tile = null;
-    }
-    else if(this.tableTiles[index].colour !== "z-blank") {
-      if (this.selectedPlayer1Tile ||this.selectedTableTile) return;
-      this.selectedTableTile = this.tableTiles[index];
-      this.tableTiles.splice(index, 1, emptyTile);
-    }
-    else if (this.selectedTableTile) {
-      this.tableTiles.splice(index, 1, this.selectedTableTile);
-      this.selectedTableTile = null;
-    }
-  } else {
-    if (this.tableTiles[index].colour === "z-blank" && this.selectedPlayer2Tile) {
-      this.tableTiles.splice(index, 1, this.selectedPlayer2Tile);
-      this.selectedPlayer2Tile = null;
-    }
-    else if(this.tableTiles[index].colour !== "z-blank") {
-      if (this.selectedPlayer2Tile ||this.selectedTableTile) return;
-      this.selectedTableTile = this.tableTiles[index];
-      this.tableTiles.splice(index, 1, emptyTile);
-    }
-    else if (this.selectedTableTile) {
-      this.tableTiles.splice(index, 1, this.selectedTableTile);
-      this.selectedTableTile = null;
+      if (this.tableTiles[index].colour === "z-blank" && this.selectedPlayer1Tile) {
+        this.tableTiles.splice(index, 1, this.selectedPlayer1Tile);
+        this.selectedPlayer1Tile = null;
+      }
+      else if(this.tableTiles[index].colour !== "z-blank") {
+        if (this.selectedPlayer1Tile ||this.selectedTableTile) return;
+        this.selectedTableTile = this.tableTiles[index];
+        this.tableTiles.splice(index, 1, emptyTile);
+      }
+      else if (this.selectedTableTile) {
+        this.tableTiles.splice(index, 1, this.selectedTableTile);
+        this.selectedTableTile = null;
+      }
+    } else {
+      if (this.tableTiles[index].colour === "z-blank" && this.selectedPlayer2Tile) {
+        this.tableTiles.splice(index, 1, this.selectedPlayer2Tile);
+        this.selectedPlayer2Tile = null;
+      }
+      else if(this.tableTiles[index].colour !== "z-blank") {
+        if (this.selectedPlayer2Tile ||this.selectedTableTile) return;
+        this.selectedTableTile = this.tableTiles[index];
+        this.tableTiles.splice(index, 1, emptyTile);
+      }
+      else if (this.selectedTableTile) {
+        this.tableTiles.splice(index, 1, this.selectedTableTile);
+        this.selectedTableTile = null;
+      };
     };
-  };
 
   };
 
