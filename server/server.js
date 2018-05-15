@@ -30,22 +30,25 @@ io.on('connection', socket => {
     gameLogic.getStartingTiles(socket.id);
     if (socket.id === gameLogic.player1ID){
       socket.emit('takeStartingTiles', gameLogic.player1Tiles)
-    } else {
+    } else if (socket.id === gameLogic.player2ID){
       socket.emit('takeStartingTiles', gameLogic.player2Tiles)
-    }
+    } else return;
 
     console.log('player 1 tiles: ', gameLogic.player1Tiles);
     console.log('player 2 tiles: ', gameLogic.player2Tiles);
+    console.log('remaining tiles', gameLogic.boxTiles.length);
   });
 
   socket.on('getExtraTileFromBox', () => {
+    if (socket.id !== gameLogic.player1ID && socket.id !== gameLogic.player2ID) return;
     gameLogic.getExtraTileFromBox(socket.id);
-    if (socket.id === gameLogic.player1ID){
-      socket.emit('takeExtraTile', gameLogic.player1Tiles)
-    } else {
-      socket.emit('takeExtraTile', gameLogic.player2Tiles)
-    }
 
+    if (socket.id === gameLogic.player1ID){
+      socket.emit('takeExtraTile', gameLogic.player1Tiles);
+    } else {
+      socket.emit('takeExtraTile', gameLogic.player2Tiles);
+    };
+    io.sockets.emit('noTilesRemaining', gameLogic.boxTiles.length);
     console.log('player 1 tiles: ', gameLogic.player1Tiles);
     console.log('player 2 tiles: ', gameLogic.player2Tiles);
   });

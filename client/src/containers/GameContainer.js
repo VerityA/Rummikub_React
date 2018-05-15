@@ -14,7 +14,9 @@ class GameContainer extends Component {
     this.tileData = new TileData();
 
     this.state = {
-      boxTiles: this.tileData.createAllTiles(),
+      take14TilesButtonDisabled: false,
+      takeExtraTileButtonDisabled: true,
+      boxTilesRemaining: 98,
       tableTiles: this.tileData.createEmptyTable(),
       selectedTableTile: null,
       playerTiles: this.tileData.createEmptyPlayerBoard(),
@@ -26,38 +28,48 @@ class GameContainer extends Component {
     this.socket.on('takeExtraTile', this.getPlayersTiles.bind(this));
     this.socket.on('showPlayerBoardTiles', this.getPlayersTiles.bind(this));
     this.socket.on('showTableTiles', this.getTableTiles.bind(this));
+    this.socket.on('noTilesRemaining', this.getNoBoxTilesRemaining.bind(this));
 
     this.handleTake14TilesClick = this.handleTake14TilesClick.bind(this);
     this.handleTakeExtraTileClick = this.handleTakeExtraTileClick.bind(this);
     this.handleBoardClick = this.handleBoardClick.bind(this);
     this.handleTableClick = this.handleTableClick.bind(this);
     this.handleTestButtonClick = this.handleTestButtonClick.bind(this);
+
+    console.log('test', this.state.take14take14TilesButtonDisabled );
+    console.log('part 2', this.state.boxTilesRemaining === 0 );
+    console.log('is take extra tile button set to disabled? ', this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0);
   };
 
   getPlayersTiles(tiles) {
     const tempState = this.state;
     tempState.playerTiles = tiles;
-    this.setState(tempState)
+    this.setState(tempState);
   };
 
   getTableTiles(tiles) {
     const tempState = this.state;
     tempState.tableTiles = tiles;
-    this.setState(tempState)
+    this.setState(tempState);
+  };
+
+  getNoBoxTilesRemaining(length) {
+    const tempState = this.state;
+    tempState.boxTilesRemaining = length;
+    this.setState(tempState);
   };
 
   handleTake14TilesClick() {
+    const tempState = this.state;
     this.socket.emit('getPlayersStartingTiles');
+    tempState.take14TilesButtonDisabled = true;
+    tempState.takeExtraTileButtonDisabled = false;
+    this.setState(tempState);
+    console.log('take14Tiles button:',this.state.take14take14TilesButtonDisabled);
   };
 
   handleTakeExtraTileClick() {
     this.socket.emit('getExtraTileFromBox');
-  };
-
-  showResultOfBoardAction(playerTiles, tableTiles) {
-    console.log("TESTING");
-    this.getPlayersTiles(playerTiles);
-    this.getTableTiles(tableTiles);
   };
 
   handleBoardClick(event) {
@@ -74,12 +86,14 @@ class GameContainer extends Component {
     this.socket.emit('playerID');
   };
 
+
+
   render() {
     return(
       <div>
         <ServerTestButton handleTestButtonClick={this.handleTestButtonClick}/>
-        <Take14TilesButton disabled={this.state.playerTiles[0].colour !== "z-blank"} handleTake14TilesClick={this.handleTake14TilesClick}/>
-        <TakeExtraTileButton disabled={this.state.boxTiles.length === 0 || this.state.playerTiles[0].colour === "z-blank"} handleTakeExtraTileClick={this.handleTakeExtraTileClick}/>
+        <Take14TilesButton disabled={this.state.take14TilesButtonDisabled} handleTake14TilesClick={this.handleTake14TilesClick}/>
+        <TakeExtraTileButton disabled={this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0} handleTakeExtraTileClick={this.handleTakeExtraTileClick}/>
         <TileTable tiles={this.state.tableTiles} handleTableClick={this.handleTableClick}/>
         <PlayersBoard tiles={this.state.playerTiles} handleBoardClick={this.handleBoardClick}/>
       </div>
