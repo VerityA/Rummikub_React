@@ -49,7 +49,42 @@ io.on('connection', socket => {
     console.log('player 1 tiles: ', gameLogic.player1Tiles);
     console.log('player 2 tiles: ', gameLogic.player2Tiles);
   });
+
+  socket.on('handleBoardClick', index => {
+    console.log(index);
+    gameLogic.handleBoardAction(socket.id, index);
+    if (socket.id === gameLogic.player1ID){
+      socket.emit('showPlayerBoardTiles', gameLogic.player1Tiles);
+      io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+    } else {
+      socket.emit('showPlayerBoardTiles', gameLogic.player2Tiles)
+      io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+    }
+
+    console.log('player 1 tiles: ', gameLogic.player1Tiles);
+    console.log('player 2 tiles: ', gameLogic.player2Tiles);
+    console.log('table tiles: ', gameLogic.tableTiles);
+  });
+
+  socket.on('handleTableClick', index => {
+    console.log(index);
+    gameLogic.handleTableAction(socket.id, index);
+    if (socket.id === gameLogic.player1ID){
+      socket.emit('showPlayerBoardTiles', gameLogic.player1Tiles);
+      io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+      console.log('player 1 tiles: ', gameLogic.player1Tiles);
+    } else {
+      socket.emit('showPlayerBoardTiles', gameLogic.player2Tiles)
+      io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+      console.log('player 2 tiles: ', gameLogic.player2Tiles);
+    }
+
+
+
+    console.log('table tiles: ', gameLogic.tableTiles);
+  });
 });
+
 
 http.listen(3001, function () {
   console.log(`Chat app running on port ${this.address().port}`);

@@ -7,6 +7,10 @@ class GameLogic {
     this.boxTiles =  this.tileData.createAllTiles(),
     this.tableTiles = this.tileData.createEmptyTable(),
 
+    this.selectedTableTile = null;
+    this.selectedPlayer1Tile = null;
+    this.selectedPlayer2Tile = null;
+
     this.player1ID = null;
     this.player2ID = null;
 
@@ -45,6 +49,96 @@ class GameLogic {
       this.player1Tiles = takeTilesObject.startingTiles;
     } else if (this.player2ID === socketID && !this.player2Tiles){
       this.player2Tiles = takeTilesObject.startingTiles;
+    };
+  };
+
+  handleTableAction(socketID, index) {
+    const emptyTile = this.tileData.createEmptyTile();
+
+    console.log('did player one click: ', (this.player1ID === socketID));
+    console.log('did player two click: ', (this.player2ID === socketID));
+
+    console.log('selectedTableTile colour: ', this.tableTiles[index].colour);
+
+    console.log('selectedPlayer1Tile:', this.selectedPlayer1Tile);
+    console.log('selectedPlayer2Tile:', this.selectedPlayer2Tile);
+
+
+    console.log('is tableTile blank and there is a selected player2 tile: ', (this.tableTiles.colour === "z-blank" && this.selectedPlayer2Tile));
+
+    if (this.player1ID === socketID) {
+    if (this.tableTiles[index].colour === "z-blank" && this.selectedPlayer1Tile) {
+      this.tableTiles.splice(index, 1, this.selectedPlayer1Tile);
+      this.selectedPlayer1Tile = null;
+    }
+    else if(this.tableTiles[index].colour !== "z-blank") {
+      if (this.selectedPlayer1Tile ||this.selectedTableTile) return;
+      this.selectedTableTile = this.tableTiles[index];
+      this.tableTiles.splice(index, 1, emptyTile);
+    }
+    else if (this.selectedTableTile) {
+      this.tableTiles.splice(index, 1, this.selectedTableTile);
+      this.selectedTableTile = null;
+    }
+  } else {
+    if (this.tableTiles[index].colour === "z-blank" && this.selectedPlayer2Tile) {
+      this.tableTiles.splice(index, 1, this.selectedPlayer2Tile);
+      this.selectedPlayer2Tile = null;
+    }
+    else if(this.tableTiles[index].colour !== "z-blank") {
+      if (this.selectedPlayer2Tile ||this.selectedTableTile) return;
+      this.selectedTableTile = this.tableTiles[index];
+      this.tableTiles.splice(index, 1, emptyTile);
+    }
+    else if (this.selectedTableTile) {
+      this.tableTiles.splice(index, 1, this.selectedTableTile);
+      this.selectedTableTile = null;
+    };
+  };
+
+  };
+
+
+  handleBoardAction(socketID, index) {
+    const emptyTile = this.tileData.createEmptyTile();
+
+    if (this.player1ID === socketID) {
+      if (this.player1Tiles[index].colour === "z-blank"){
+        if (this.selectedTableTile) {
+          this.player1Tiles.splice(index, 1, this.selectedTableTile);
+          this.selectedTableTile = null;
+        }
+        else if (this.selectedPlayer1Tile) {
+          this.player1Tiles.splice(index, 1, this.selectedPlayer1Tile);
+          this.selectedPlayer1Tile = null;
+        }
+        else  return;
+
+      } else if (this.selectedTableTile || this.selectedPlayer1Tile) {
+        return;
+      } else {
+        this.selectedPlayer1Tile = this.player1Tiles[index];
+        this.player1Tiles.splice(index, 1, emptyTile);
+      }
+    }
+    else {
+      if (this.player2Tiles[index].colour === "z-blank"){
+        if (this.selectedTableTile) {
+          this.player2Tiles.splice(index, 1, this.selectedTableTile);
+          this.selectedTableTile = null;
+        }
+        else if (this.selectedPlayer2Tile) {
+          this.player2Tiles.splice(index, 1, this.selectedPlayer2Tile);
+          this.selectedPlayer2Tile = null;
+        }
+        else  return;
+
+      } else if (this.selectedTableTile || this.selectedPlayer2Tile) {
+        return;
+      } else {
+        this.selectedPlayer2Tile = this.player2Tiles[index];
+        this.player2Tiles.splice(index, 1, emptyTile);
+      };
     };
   };
 

@@ -24,6 +24,8 @@ class GameContainer extends Component {
     this.socket = io("http://localhost:3001");
     this.socket.on('takeStartingTiles', this.getPlayersTiles.bind(this));
     this.socket.on('takeExtraTile', this.getPlayersTiles.bind(this));
+    this.socket.on('showPlayerBoardTiles', this.getPlayersTiles.bind(this));
+    this.socket.on('showTableTiles', this.getTableTiles.bind(this));
 
     this.handleTake14TilesClick = this.handleTake14TilesClick.bind(this);
     this.handleTakeExtraTileClick = this.handleTakeExtraTileClick.bind(this);
@@ -38,6 +40,12 @@ class GameContainer extends Component {
     this.setState(tempState)
   };
 
+  getTableTiles(tiles) {
+    const tempState = this.state;
+    tempState.tableTiles = tiles;
+    this.setState(tempState)
+  };
+
   handleTake14TilesClick() {
     this.socket.emit('getPlayersStartingTiles');
   };
@@ -46,60 +54,20 @@ class GameContainer extends Component {
     this.socket.emit('getExtraTileFromBox');
   };
 
+  showResultOfBoardAction(playerTiles, tableTiles) {
+    console.log("TESTING");
+    this.getPlayersTiles(playerTiles);
+    this.getTableTiles(tableTiles);
+  };
+
   handleBoardClick(event) {
     const index = event.target.value;
-    const emptyTile = this.tileData.createEmptyTile();
-    const tempState = this.state;
-    console.log(tempState.playerTiles[index].colour);
-    if (tempState.playerTiles[index].colour === "z-blank"){
-
-      if (tempState.selectedTableTile) {
-        tempState.playerTiles.splice(index, 1, tempState.selectedTableTile);
-        tempState.selectedTableTile = null;
-      }
-      else if (tempState.selectedPlayerTile) {
-        console.log(index);
-        tempState.playerTiles.splice(index, 1, tempState.selectedPlayerTile);
-        tempState.selectedPlayerTile = null;
-      }
-      else  return;
-
-    } else if (tempState.selectedTableTile || tempState.selectedPlayerTile) {
-      return;
-    } else {
-      tempState.selectedPlayerTile = tempState.playerTiles[index];
-      tempState.playerTiles.splice(index, 1, emptyTile);
-      // tempState.playerTiles = this.tileData.sortTilesByColourThenValue(tempState.playerTiles);
-    };
-
-    this.setState(tempState);
+    this.socket.emit('handleBoardClick', index);
   };
 
   handleTableClick(event) {
     const index = event.target.value;
-    const emptyTile = this.tileData.createEmptyTile();
-
-    const tempState = this.state;
-
-    console.log(tempState.tableTiles[index].colour === "z-blank");
-    console.log(tempState.selectedTableTile);
-
-    if (tempState.tableTiles[index].colour === "z-blank" && tempState.selectedPlayerTile) {
-      tempState.tableTiles.splice(index, 1, tempState.selectedPlayerTile);
-      tempState.selectedPlayerTile = null;
-    }
-    else if(tempState.tableTiles[index].colour !== "z-blank") {
-      if (tempState.selectedPlayerTile ||tempState.selectedTableTile) return;
-      tempState.selectedTableTile = tempState.tableTiles[index];
-      tempState.tableTiles.splice(index, 1, emptyTile);
-    }
-    else if (tempState.selectedTableTile) {
-      tempState.tableTiles.splice(index, 1, tempState.selectedTableTile);
-      tempState.selectedTableTile = null;
-    };
-
-
-    this.setState(tempState);
+    this.socket.emit('handleTableClick', index);
   };
 
   handleTestButtonClick() {
