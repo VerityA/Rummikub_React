@@ -14,6 +14,8 @@ class GameLogic {
     this.player1ID = null;
     this.player2ID = null;
 
+    this.currentPlayer = null;
+
     this.player1Tiles = null;
     this.player2Tiles = null;
   };
@@ -23,6 +25,20 @@ class GameLogic {
       this.player1ID = playerID;
     } else if (!this.player2ID){
       this.player2ID = playerID;
+    };
+  };
+
+  setCurrentPlayer(playerID) {
+    if (!this.currentPlayer && this.player1ID) {
+      this.currentPlayer = this.player1ID;
+    } else return;
+  };
+
+  changeCurrentPlayer() {
+    if (this.currentPlayer === this.player1ID) {
+      this.currentPlayer = this.player2ID;
+    } else {
+      this.currentPlayer = this.player1ID;
     };
   };
 
