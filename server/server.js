@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io').listen(http);
 const GameLogic = require('./models/GameLogic.js');
 
 const gameLogic = new GameLogic();
@@ -9,6 +9,7 @@ const gameLogic = new GameLogic();
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Credentials", true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
@@ -72,11 +73,13 @@ io.on('connection', socket => {
     if (socket.id !== gameLogic.player1ID && socket.id !== gameLogic.player2ID) return;
     gameLogic.getExtraTileFromBox(socket.id);
 
+    
+
     if (socket.id === gameLogic.player1ID){
       socket.emit('takeExtraTile', gameLogic.player1Tiles);
-    } else {
+    } else if (socket.id === gameLogic.player2ID){
       socket.emit('takeExtraTile', gameLogic.player2Tiles);
-    };
+    } else return;
     io.sockets.emit('noTilesRemaining', gameLogic.boxTiles.length);
     console.log('player 1 tiles: ', gameLogic.player1Tiles);
     console.log('player 2 tiles: ', gameLogic.player2Tiles);

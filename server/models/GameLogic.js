@@ -47,6 +47,7 @@ class GameLogic {
     this.boxTiles = takeTileObject.remainingBox;
 
     const extraTile = takeTileObject.extraTile;
+    console.log('test', this.player1ID === socketID);
 
     if (this.player1ID === socketID) {
       const indexToInsert = this.tileData.findIndexOfFirstEmptyTile(this.player1Tiles);
