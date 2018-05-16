@@ -44,7 +44,7 @@ io.on('connection', socket => {
   socket.on('changePlayerTurn', () => {
     gameLogic.changeCurrentPlayer();
     gameLogic.setNoTilesOnBoardLastGo(socket.id);
-    console.log(gameLogic.currentPlayer);
+
     if (socket.id === gameLogic.currentPlayer) {
       socket.emit('setNotCurrentPlayer', false);
       socket.broadcast.emit('setNotCurrentPlayer', true);
@@ -56,7 +56,6 @@ io.on('connection', socket => {
 
     socket.broadcast.emit('changeBannerMessage', "It's your turn! Press 'End Turn' when you're done ...");
     socket.emit('changeBannerMessage', " Waiting for your opponent to take their turn ...");
-    console.log('currentPlayer', gameLogic.currentPlayer);
   });
 
   socket.on('getPlayersStartingTiles', () => {
@@ -92,25 +91,28 @@ io.on('connection', socket => {
   });
 
   socket.on('handleBoardClick', index => {
-    console.log(index);
     gameLogic.handleBoardAction(socket.id, index);
     if (socket.id === gameLogic.player1ID){
       socket.emit('showPlayerBoardTiles', gameLogic.player1Tiles);
-      console.log('length of P1 tiles on last go: ', gameLogic.noTilesOnPlayer1BoardLastGo);
-      console.log('length of P1 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles));
+      // console.log('length of P1 tiles on last go: ', gameLogic.noTilesOnPlayer1BoardLastGo);
+      // console.log('length of P1 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles));
       if (gameLogic.noTilesOnPlayer1BoardLastGo > gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles)){
         socket.emit('changeStatusOfTakeExtraTileButton', true);
+        socket.emit('changeStatusOfEndPlayerTurnButton', false);
       } else {
         socket.emit('changeStatusOfTakeExtraTileButton', false);
+        socket.emit('changeStatusOfEndPlayerTurnButton', true);
       };
     } else {
       socket.emit('showPlayerBoardTiles', gameLogic.player2Tiles);
-      console.log('length of P2 tiles on last go: ', gameLogic.noTilesOnPlayer2BoardLastGo);
-      console.log('length of P2 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles));
+      // console.log('length of P2 tiles on last go: ', gameLogic.noTilesOnPlayer2BoardLastGo);
+      // console.log('length of P2 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles));
       if (gameLogic.noTilesOnPlayer2BoardLastGo > gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles)){
         socket.emit('changeStatusOfTakeExtraTileButton', true);
+        socket.emit('changeStatusOfEndPlayerTurnButton', false);
       } else {
         socket.emit('changeStatusOfTakeExtraTileButton', false);
+        socket.emit('changeStatusOfEndPlayerTurnButton', true);
       };
     };
 
@@ -121,8 +123,22 @@ io.on('connection', socket => {
     gameLogic.handleTableAction(socket.id, index);
     if (socket.id === gameLogic.player1ID){
       io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+      console.log('length of P1 tiles on last go: ', gameLogic.noTilesOnPlayer1BoardLastGo);
+      console.log('length of P1 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles));
+      // if (gameLogic.noTilesOnPlayer1BoardLastGo > gameLogic.countNoActiveTilesOnBoard(gameLogic.player1Tiles) && !gameLogic.selectedPlayer1Tile){
+      //   socket.emit('changeStatusOfEndPlayerTurnButton', true);
+      // } else {
+      //   socket.emit('changeStatusOfEndPlayerTurnButton', false);
+      // };
     } else {
       io.sockets.emit('showTableTiles', gameLogic.tableTiles);
+      console.log('length of P2 tiles on last go: ', gameLogic.noTilesOnPlayer2BoardLastGo);
+      console.log('length of P2 tiles on current go: ', gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles));
+      // if (gameLogic.noTilesOnPlayer2BoardLastGo > gameLogic.countNoActiveTilesOnBoard(gameLogic.player2Tiles) && !gameLogic.selectedPlayer2Tile){
+      //   socket.emit('changeStatusOfEndPlayerTurnButton', true);
+      // } else {
+      //   socket.emit('changeStatusOfEndPlayerTurnButton', false);
+      // };
     };
   });
 

@@ -18,8 +18,9 @@ class GameContainer extends Component {
 
     this.state = {
       bannerMessage: "Welcome to RummyCub!",
+      endPlayerTurnButtonDisabled: true,
       readyToPlayDisabled: false,
-      take14TilesButtonDisabled: false,
+      take14TilesButtonDisabled: true,
       takeExtraTileButtonDisabled: true,
       notPlayersTurn: true,
       boxTilesRemaining: 98,
@@ -38,6 +39,7 @@ class GameContainer extends Component {
     this.socket.on('noTilesRemaining', this.getNoBoxTilesRemaining.bind(this));
     this.socket.on('setNotCurrentPlayer', this.setNotCurrentPlayer.bind(this));
     this.socket.on('changeStatusOfTakeExtraTileButton', this.changeStatusOfTakeExtraTileButton.bind(this));
+    this.socket.on('changeStatusOfEndPlayerTurnButton', this.changeStatusOfEndPlayerTurnButton.bind(this));
     this.socket.on('changeBannerMessage', this.changeBannerMessage.bind(this));
     this.socket.on('endGame', this.endGame.bind(this));
 
@@ -47,11 +49,6 @@ class GameContainer extends Component {
     this.handleTableClick = this.handleTableClick.bind(this);
     this.handleReadyToPlayClick = this.handleReadyToPlayClick.bind(this);
     this.handleEndTurnClick = this.handleEndTurnClick.bind(this);
-
-
-    console.log('test', this.state.take14TilesButtonDisabled );
-    console.log('part 2', this.state.boxTilesRemaining === 0 );
-    console.log('is take extra tile button set to disabled? ', this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0);
   };
 
   endGame() {
@@ -75,15 +72,21 @@ class GameContainer extends Component {
     this.setState(tempState);
   };
 
+  changeStatusOfEndPlayerTurnButton(trueOrFalse) {
+    const tempState = this.state;
+    tempState.endPlayerTurnButtonDisabled = trueOrFalse;
+    this.setState(tempState);
+  };
+
   setNotCurrentPlayer(trueOrFalse) {
     const tempState = this.state;
     tempState.notPlayersTurn = trueOrFalse;
-    tempState.takeExtraTileButtonDisabled = trueOrFalse;
+    if (tempState.take14TilesButtonDisabled) {
+      tempState.takeExtraTileButtonDisabled = trueOrFalse};
     this.setState(tempState);
   };
 
   getPlayersTiles(tiles) {
-    console.log('HELLOOOOO');
     const tempState = this.state;
     tempState.playerTiles = tiles;
     this.setState(tempState);
@@ -105,7 +108,11 @@ class GameContainer extends Component {
     const tempState = this.state;
     this.socket.emit('setFirstPlayerTurn');
     tempState.readyToPlayDisabled = true;
+    tempState.take14TilesButtonDisabled = false;
+    console.log('before', tempState.endPlayerTurnButtonDisabled);
+    tempState.endPlayerTurnButtonDisabled = true;
     this.setState(tempState);
+    console.log('after', tempState.endPlayerTurnButtonDisabled);
   };
 
   handleTake14TilesClick() {
@@ -117,12 +124,14 @@ class GameContainer extends Component {
   };
 
   handleTakeExtraTileClick() {
+    console.log('before status: ', this.state.takeExtraTileButtonDisabled);
     this.socket.emit('getExtraTileFromBox');
     this.socket.emit('changePlayerTurn');
     const tempState = this.state;
     tempState.takeExtraTileButtonDisabled = true;
-    // tempState.endPlayerTurnButtonDisabled = true;
+    tempState.endPlayerTurnButtonDisabled = true;
     this.setState(tempState);
+    console.log('after status: ', this.state.takeExtraTileButtonDisabled);
   };
 
   handleBoardClick(event) {
@@ -141,6 +150,7 @@ class GameContainer extends Component {
     this.socket.emit('changePlayerTurn');
     const tempState = this.state;
     tempState.takeExtraTileButtonDisabled = true;
+    tempState.endPlayerTurnButtonDisabled = true;
     this.setState(tempState);
   };
 
@@ -152,7 +162,7 @@ class GameContainer extends Component {
         <ReadyToPlayButton disabled={this.state.readyToPlayDisabled} handleReadyToPlayClick={this.handleReadyToPlayClick}/>
         <Take14TilesButton disabled={this.state.take14TilesButtonDisabled} handleTake14TilesClick={this.handleTake14TilesClick}/>
         <TakeExtraTileButton disabled={this.state.notPlayersTurn || this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0} handleTakeExtraTileClick={this.handleTakeExtraTileClick}/>
-        <EndPlayerTurnButton disabled={this.state.notPlayersTurn} handleEndTurnClick={this.handleEndTurnClick}/>
+        <EndPlayerTurnButton disabled={this.state.endPlayerTurnButtonDisabled} handleEndTurnClick={this.handleEndTurnClick}/>
         <TileTable disabled={this.state.notPlayersTurn} tiles={this.state.tableTiles} handleTableClick={this.handleTableClick}/>
         <PlayersBoard disabled={this.state.notPlayersTurn || this.tileData.countBlankTilesOnBoard(this.state.playerTiles) === 28} tiles={this.state.playerTiles} handleBoardClick={this.handleBoardClick}/>
       </div>
