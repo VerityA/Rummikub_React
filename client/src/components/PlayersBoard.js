@@ -3,7 +3,7 @@ import Tile from './Tile.js';
 
 const PlayersBoard = (props) => {
   const tiles = props.tiles.map((tile, index) => {
-    return <Tile  disabled={props.disabled} handleClick={props.handleBoardClick} className="player-tile" value={index} key={index} tileValue={tile.value} image={tile.img} colour={this.colour}/>
+    return <Tile handleClick={props.handleBoardClick} className="player-tile" value={index} key={index} tileValue={tile.value} image={tile.img} colour={this.colour}/>
   });
 
   return(

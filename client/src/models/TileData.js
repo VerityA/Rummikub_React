@@ -133,6 +133,12 @@ class TileData {
     return count;
   };
 
+  countColouredTilesOnBoard(board) {
+    const noOfBlankTiles = this.countBlankTilesOnBoard(board);
+    const noOfColouredTiles = 28 - noOfBlankTiles;
+    return noOfColouredTiles;
+  };
+
   getStartingTilesFromBox(box) {
     const startingTiles = [];
 

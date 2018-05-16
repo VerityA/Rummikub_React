@@ -16,6 +16,7 @@ class GameContainer extends Component {
     this.tileData = new TileData();
 
     this.state = {
+      // endPlayerTurnButtonDisabled: false,
       readyToPlayDisabled: false,
       take14TilesButtonDisabled: false,
       takeExtraTileButtonDisabled: true,
@@ -35,6 +36,7 @@ class GameContainer extends Component {
     this.socket.on('showTableTiles', this.getTableTiles.bind(this));
     this.socket.on('noTilesRemaining', this.getNoBoxTilesRemaining.bind(this));
     this.socket.on('setNotCurrentPlayer', this.setNotCurrentPlayer.bind(this));
+    this.socket.on('changeStatusOfTakeExtraTileButton', this.changeStatusOfTakeExtraTileButton.bind(this));
 
     this.handleTake14TilesClick = this.handleTake14TilesClick.bind(this);
     this.handleTakeExtraTileClick = this.handleTakeExtraTileClick.bind(this);
@@ -47,6 +49,12 @@ class GameContainer extends Component {
     console.log('test', this.state.take14TilesButtonDisabled );
     console.log('part 2', this.state.boxTilesRemaining === 0 );
     console.log('is take extra tile button set to disabled? ', this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0);
+  };
+
+  changeStatusOfTakeExtraTileButton(trueOrFalse) {
+    const tempState = this.state;
+    tempState.takeExtraTileButtonDisabled = trueOrFalse;
+    this.setState(tempState);
   };
 
   setNotCurrentPlayer(trueOrFalse) {
@@ -88,13 +96,14 @@ class GameContainer extends Component {
     tempState.take14TilesButtonDisabled = true;
     tempState.takeExtraTileButtonDisabled = false;
     this.setState(tempState);
-    console.log('Hello David!');
   };
 
   handleTakeExtraTileClick() {
     this.socket.emit('getExtraTileFromBox');
+    this.socket.emit('changePlayerTurn');
     const tempState = this.state;
     tempState.takeExtraTileButtonDisabled = true;
+    // tempState.endPlayerTurnButtonDisabled = true;
     this.setState(tempState);
   };
 
