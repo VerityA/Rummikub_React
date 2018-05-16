@@ -21,6 +21,16 @@ class GameLogic {
 
     this.noTilesOnPlayer1BoardLastGo = 14;
     this.noTilesOnPlayer2BoardLastGo = 14;
+
+    this.winner = null;
+  };
+
+  checkForAWin(playerID) {
+    if(this.player1ID === playerID && this.countNoActiveTilesOnBoard(this.player1Tiles) === 0) {
+      this.winner = this.player1ID;
+    } else if (this.player2ID === playerID && this.countNoActiveTilesOnBoard(this.player2Tiles) === 0) {
+      this.winner = this.player2ID;
+    };
   };
 
   countNoActiveTilesOnBoard(board) {

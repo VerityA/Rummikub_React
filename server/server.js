@@ -22,7 +22,6 @@ io.on('connection', socket => {
   console.log('player 1 tiles: ', gameLogic.player1Tiles);
   console.log('player 2 tiles: ', gameLogic.player2Tiles);
 
-  // gameLogic.currentPlayer = gameLogic.player1ID;
   console.log('socketID', socket.id);
   console.log('player1ID', gameLogic.player1ID);
   console.log('is socketID equal to player1ID?', socket.id === gameLogic.player1ID);
@@ -34,8 +33,12 @@ io.on('connection', socket => {
     gameLogic.setCurrentPlayer();
     console.log('currentPlayer', gameLogic.currentPlayer);
     if (socket.id === gameLogic.player1ID){
-      socket.emit('setNotCurrentPlayer', false)
-    };
+      socket.emit('setNotCurrentPlayer', false);
+      socket.emit('changeBannerMessage', "Welcome Player 1 ...  Take your turn... ");
+    } else {
+      socket.emit('changeBannerMessage', "Welcome Player 2 ...  Waiting for Player 1 to make the first move... ");
+      // socket.setTimeOut(socket.emit('changeBannerMessage', " Waiting for your opponent to take their turn ..."), 2000);
+    }
   });
 
   socket.on('changePlayerTurn', () => {
@@ -45,11 +48,14 @@ io.on('connection', socket => {
     if (socket.id === gameLogic.currentPlayer) {
       socket.emit('setNotCurrentPlayer', false);
       socket.broadcast.emit('setNotCurrentPlayer', true);
+
     } else {
       socket.emit('setNotCurrentPlayer', true);
       socket.broadcast.emit('setNotCurrentPlayer', false);
     };
 
+    socket.broadcast.emit('changeBannerMessage', "It's your turn! Press 'End Turn' when you're done ...");
+    socket.emit('changeBannerMessage', " Waiting for your opponent to take their turn ...");
     console.log('currentPlayer', gameLogic.currentPlayer);
   });
 
@@ -119,7 +125,22 @@ io.on('connection', socket => {
       io.sockets.emit('showTableTiles', gameLogic.tableTiles);
     };
   });
+
+  socket.on('lookForAWinner', () => {
+    gameLogic.checkForAWin(socket.id);
+    if (gameLogic.winner) {
+      io.sockets.emit('endGame');
+    };
+    if (gameLogic.winner === gameLogic.player1ID) {
+      io.sockets.emit('changeBannerMessage', "It's all over... PLAYER 1 WINS!!!");
+    } else if (gameLogic.winner === gameLogic.player2ID) {
+      io.sockets.emit('changeBannerMessage', "It's all over... PLAYER 2 WINS!!!");
+    }
+  });
+
 });
+
+
 
 
 http.listen(3001, function () {

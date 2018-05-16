@@ -6,6 +6,7 @@ import TileData from '../models/TileData.js';
 import TileTable from '../components/TileTable.js';
 import PlayersBoard from '../components/PlayersBoard.js';
 import ReadyToPlayButton from '../components/ReadyToPlayButton.js';
+import BannerMessage from '../components/BannerMessage.js';
 
 import io from 'socket.io-client';
 
@@ -16,7 +17,7 @@ class GameContainer extends Component {
     this.tileData = new TileData();
 
     this.state = {
-      // endPlayerTurnButtonDisabled: false,
+      bannerMessage: "Welcome to RummyCub!",
       readyToPlayDisabled: false,
       take14TilesButtonDisabled: false,
       takeExtraTileButtonDisabled: true,
@@ -37,6 +38,8 @@ class GameContainer extends Component {
     this.socket.on('noTilesRemaining', this.getNoBoxTilesRemaining.bind(this));
     this.socket.on('setNotCurrentPlayer', this.setNotCurrentPlayer.bind(this));
     this.socket.on('changeStatusOfTakeExtraTileButton', this.changeStatusOfTakeExtraTileButton.bind(this));
+    this.socket.on('changeBannerMessage', this.changeBannerMessage.bind(this));
+    this.socket.on('endGame', this.endGame.bind(this));
 
     this.handleTake14TilesClick = this.handleTake14TilesClick.bind(this);
     this.handleTakeExtraTileClick = this.handleTakeExtraTileClick.bind(this);
@@ -49,6 +52,21 @@ class GameContainer extends Component {
     console.log('test', this.state.take14TilesButtonDisabled );
     console.log('part 2', this.state.boxTilesRemaining === 0 );
     console.log('is take extra tile button set to disabled? ', this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0);
+  };
+
+  endGame() {
+    const tempState = this.state;
+    tempState.readyToPlayDisabled = true;
+    tempState.take14TilesButtonDisabled = true;
+    tempState.takeExtraTileButtonDisabled = true,
+    tempState.notPlayersTurn =  true,
+    this.setState(tempState);
+  };
+
+  changeBannerMessage(message){
+    const tempState = this.state;
+    tempState.bannerMessage = message;
+    this.setState(tempState);
   };
 
   changeStatusOfTakeExtraTileButton(trueOrFalse) {
@@ -115,6 +133,7 @@ class GameContainer extends Component {
   handleTableClick(event) {
     const index = event.target.value;
     this.socket.emit('handleTableClick', index);
+    this.socket.emit('lookForAWinner');
   };
 
   handleEndTurnClick() {
@@ -129,6 +148,7 @@ class GameContainer extends Component {
   render() {
     return(
       <div>
+        <BannerMessage message={this.state.bannerMessage}/>
         <ReadyToPlayButton disabled={this.state.readyToPlayDisabled} handleReadyToPlayClick={this.handleReadyToPlayClick}/>
         <Take14TilesButton disabled={this.state.take14TilesButtonDisabled} handleTake14TilesClick={this.handleTake14TilesClick}/>
         <TakeExtraTileButton disabled={this.state.notPlayersTurn || this.state.takeExtraTileButtonDisabled || this.state.boxTilesRemaining === 0} handleTakeExtraTileClick={this.handleTakeExtraTileClick}/>
